@@ -1,0 +1,240 @@
+# ===== COMPLETE PATIENT APP - FINAL - ALL IN ONE =====
+# Flow: Name -> Internal/External -> Wall -> Symptoms -> Medicine -> First Aid -> Report -> Pincode -> Nearest Hospital
+# Type numbers only. Multiple like 1,3
+
+import datetime, random
+
+def multi_select(options, title):
+    print(f"\n{title}")
+    print("Select MULTIPLE. Example: 1,3")
+    for i, opt in enumerate(options, 1):
+        print(f"{i}. {opt}")
+    raw = input("Type numbers: ")
+    selected = []
+    for x in raw.split(","):
+        x = x.strip()
+        if x.isdigit() and 1 <= int(x) <= len(options):
+            selected.append(options[int(x)-1])
+    if not selected:
+        selected = [options[0]]
+    print(f"You selected: {selected}")
+    return selected
+
+def single_select(options, title):
+    print(f"\n{title}")
+    for i, opt in enumerate(options, 1):
+        print(f"{i}. {opt}")
+    raw = input("Type number: ").strip()
+    if raw.isdigit() and 1 <= int(raw) <= len(options):
+        return options[int(raw)-1]
+    return options[0]
+
+# ===== WALLS =====
+internal_walls = {
+    "1": ("FEVER WALL", ["Fever","High Fever","Low Fever","Chills","Shivering","Sweating","Body Hot","Body Cold","Head Pain","Tiredness","Body Pain","Fever at Night"]),
+    "2": ("STOMACH WALL", ["Stomach Pain","Stomach Upset","Vomiting Feeling","Vomiting","Loose Motion","Diarrhea","Constipation","Acidity","Gas","Bloating","No Hunger","Nausea"]),
+    "3": ("HEAD / COLD WALL", ["Head Pain","Heavy Head","Cold","Running Nose","Blocked Nose","Sneezing","Cough","Dry Cough","Throat Pain","Dry Throat","Sore Throat","Loss of Smell"]),
+    "4": ("PAIN / BODY WALL", ["Body Pain","Leg Pain","Back Pain","Joint Pain","Muscle Pain","Neck Pain","Shoulder Pain","Hand Pain","Knee Pain","Weakness","Dizziness","Head Spinning"]),
+    "5": ("EMERGENCY WALL", ["Breathing Problem","Chest Pain","Chest Tight","Heart Fast Beating","Fainting Feeling","Blood in Vomit","Blood in Stool","Blood in Urine","Memory Loss","Confusion"]),
+    "6": ("SHOW ALL 100", None)
+}
+external_walls = {
+    "1": ("BLEEDING / CUT WALL", ["Cut Small","Cut Deep","Cut Long","Bleeding Little","Bleeding Lot","Bleeding Stopped","Blood Clot","Wound Open","Skin Torn","Pain"]),
+    "2": ("BURN WALL", ["Skin Burn","Burn 1st Degree","Burn 2nd Degree","Burn 3rd Degree","Hot Water Burn","Oil Burn","Fire Burn","Burning Pain","Blister","Water Blister","Sun Burn","Skin Red"]),
+    "3": ("SWELLING / BRUISE WALL", ["Swelling","Redness","Red Around Wound","Bruise","Black and Blue Mark","Bump","Lump","Knee Swollen","Finger Swollen","Foot Swollen","Pain","Stiffness"]),
+    "4": ("HEAD INJURY WALL", ["Head Cut","Headache After Hit","Dizziness After Hit","Vomiting After Hit","Memory Loss After Hit","Unconscious","Eye Injury","Nose Cut","Ear Cut","Lip Cut"]),
+    "5": ("BITE / INFECTION WALL", ["Dog Bite Mark","Cat Bite Mark","Snake Bite Mark","Bee Sting Pain","Insect Bite Mark","Pus","Yellow Discharge","Bad Smell from Wound","Fever After Wound","Infection","Dirt in Wound"]),
+    "6": ("CANNOT MOVE / BONE WALL", ["Cannot Move Part","Difficulty Moving","Fracture Doubt","Dislocation Doubt","Bone Pain","Joint Pain After Hit","Wrist Pain","Ankle Sprain","Numbness","Tingling"]),
+    "7": ("SHOW ALL 100", None)
+}
+
+internal_symptoms_full = ["Fever","High Fever","Low Fever","Head Pain","Heavy Head","Body Pain","Leg Pain","Back Pain","Joint Pain","Muscle Pain","Stomach Pain","Stomach Upset","Vomiting Feeling","Vomiting","Loose Motion","Constipation","No Hunger","More Hunger","Throat Pain","Dry Throat","Cough","Dry Cough","Wet Cough","Cold","Running Nose","Blocked Nose","Sneezing","Breathing Problem","Chest Pain","Chest Tight","Heart Fast Beating","Dizziness","Fainting Feeling","Tiredness","Weakness","Sleepiness","No Sleep","Sweating","Chills","Shivering","Nausea","Acidity","Gas","Bloating","Burping","Mouth Bitter","Tongue White","Bad Smell Mouth","Eye Pain","Eye Red","Eye Watering","Ear Pain","Ear Block","Skin Itching","Skin Rash","Skin Red","Allergy","Pimple","Hair Fall","Urine Burning","Urine More Times","Urine Less","Head Spinning","Memory Loss","Confusion","Anger","Sadness","Anxiety","Fear","BP High","BP Low","Sugar High","Sugar Low","Diarrhea","Blood in Stool","Blood in Urine","Blood in Vomit","Dehydration","Dry Lips","Dry Skin","Loss of Taste","Loss of Smell","Body Hot","Body Cold","Neck Pain","Shoulder Pain","Hand Pain","Foot Pain","Knee Pain","Elbow Pain","Finger Pain","Toe Pain","Nail Pain","Swelling in Legs","Swelling in Face","Swelling in Hands","Weight Loss","Weight Gain","Appetite Loss","Thirst More","Thirst Less","Fever at Night","Fever in Morning"]
+external_symptoms_full = ["Cut Small","Cut Deep","Cut Long","Scratch","Scrape","Wound Open","Wound Closed","Bleeding Little","Bleeding Lot","Bleeding Stopped","Blood Clot","Swelling","Redness","Red Around Wound","Pain","Burning Pain","Throbbing Pain","Itching","Pus","White Discharge","Yellow Discharge","Bad Smell from Wound","Skin Peeling","Skin Torn","Skin Damaged","Skin Burn","Skin Black","Skin Blue","Skin White","Bruise","Black and Blue Mark","Hematoma","Bump","Lump","Blister","Water Blister","Blood Blister","Numbness","Tingling","Cannot Move Part","Difficulty Moving","Stiffness","Weakness in Part","Fever After Wound","Infection","Tetanus Doubt","Dirt in Wound","Stone in Wound","Glass in Wound","Wood Piece in Wound","Animal Bite Mark","Dog Bite Mark","Cat Bite Mark","Snake Bite Mark","Insect Bite Mark","Mosquito Bite Swollen","Bee Sting Pain","Ant Bite Pain","Burn 1st Degree","Burn 2nd Degree","Burn 3rd Degree","Hot Water Burn","Oil Burn","Fire Burn","Electric Burn","Chemical Burn","Sun Burn","Rash Around Wound","Allergy Around Wound","Skin Dry Around","Skin Crack","Nail Broken","Nail Bleeding","Finger Cut","Toe Cut","Palm Cut","Foot Cut","Knee Scrape","Elbow Scrape","Head Cut","Face Cut","Lip Cut","Eye Injury","Ear Cut","Nose Cut","Neck Scratch","Shoulder Hurt","Back Scratch","Chest Scratch","Stomach Scratch","Leg Cut","Arm Cut","Hand Cut","Wrist Pain","Ankle Sprain","Knee Swollen","Elbow Swollen","Finger Swollen","Toe Swollen","Foot Swollen"]
+internal_causes = ["Ate Pani Puri Outside","Ate Fried Food","Ate Spicy Food","Ate Old Food","Ate Street Food","Drank Dirty Water","Drank Cold Drink","Ate Ice Cream","Ate Pizza Burger","Ate Chinese Food","Fall from Bike","Fall from Stairs","Fall While Playing","Hit by Ball","Hit by Stone","Hit by Door","Small Accident","Big Accident","Hurt in Gym","Hurt While Running","Over Eating","Not Eating","Skipped Meal","Ate Late Night","Slept Late","No Sleep","Work Pressure","Exam Stress","Long Travel","Changed Weather","Rain Drenched","Sun Exposure","Cold Air","Dust Allergy","Pollution","Mosquito Bite","Insect Bite","Dog Bite","Cat Scratch","Touched Dirty Thing","Took Wrong Pill","Took Expired Pill","Took More Dose","Alcohol","Smoking","Energy Drink","Too Much Tea","Too Much Coffee","Junk Food Daily","Did Not Drink Water","Food Poisoning","Viral Fever","Bacterial Infection","Typhoid Doubt","Malaria Doubt","Dengue Doubt","Jaundice Doubt","Stomach Infection","Throat Infection","Urine Infection","Constipation Problem","Acidity Problem","Migraine","Sinus Problem","Allergy Season","Period Pain","Pregnancy Doubt","Diabetes Issue","BP Issue","Thyroid Issue","Heart Problem","Kidney Problem","Liver Problem","Lungs Problem","Asthma Attack","Cold and Flu","Covid Doubt","Food Allergy","Medicine Allergy","Skin Allergy","Head Injury Small","Back Injury","Leg Injury","Hand Injury","Neck Injury","Eye Injury","Ear Injury","Nose Bleed","Tooth Pain","Gum Pain","Body Hurt","Muscle Pull","Sprain","Fracture Doubt","Cramp","Dehydration","Sun Stroke","Heat Stroke","Exhaustion","Over Work","Depression Feeling","Panic Attack","Over Thinking","No Reason","Do Not Know","Other Reason","Ate Unwashed Fruit","Ate Raw Food","Ate Too Much Sweet","Ate Too Much Salt"]
+external_causes = ["Fell from Bike","Fell from Cycle","Fell from Stairs","Fell While Running","Fell While Playing","Slipped in Bathroom","Slipped on Road","Hit by Ball","Hit by Bat","Hit by Stone","Hit by Door","Hit by Table","Hit by Car","Hit by Bike","Road Accident","Sports Injury","Gym Injury","Fight","Pushed by Someone","Kicked by Someone","Cut by Knife","Cut by Blade","Cut by Glass","Cut by Paper","Cut by Nail","Cut by Tin","Cut by Scissor","Cut by Sharp Metal","Burn by Hot Water","Burn by Oil","Burn by Fire","Burn by Iron","Burn by Cracker","Electric Shock","Chemical Splash","Dog Bite","Cat Bite","Monkey Bite","Snake Bite","Bee Sting","Insect Bite","Mosquito Bite","Ant Bite","Spider Bite","Scratched by Nail","Scratched by Cat","Scratched by Branch","Thorn Prick","Wood Prick","Glass Prick","Needle Prick","Injection Pain","Tattoo Pain","Piercing Pain","Hair Pull","Ear Pull","Nose Injury","Eye Hit","Head Hit by Wall","Head Hit by Pole","Leg Hit by Stone","Hand Hit by Hammer","Foot Hit by Weight","Toe Hit by Door","Finger Jammed in Door","Hand Caught in Machine","Burn by Sun","Allergy by Cream","Allergy by Soap","Reaction by Medicine","Operation Wound","Stitch Open","Stitch Pain","Old Wound Open Again","New Wound","Wound by Surgery","Wound by Accident","Wound by Sports","Wound by Fall","Wound by Fight","Cut While Cooking","Cut While Cutting Vegetables","Cut While Shaving","Cut While Cutting Paper","Hurt While Cleaning","Hurt While Lifting Heavy","Hurt While Dancing","Hurt While Jumping","Hurt While Climbing","Hurt While Swimming","Do Not Know","Other Cause","Multiple Injuries","Small Injury","Big Injury","Deep Injury","Surface Injury","Old Injury","New Injury","Repeated Injury"]
+
+# ===== BELGAUM HOSPITALS BY PINCODE =====
+belgaum_hospitals = {
+    "590001": ["BIMS Hospital - Govt Medical College, Dr B R Ambedkar Road - 590001 - Govt, Emergency, Trauma","Deccan Medical Centre - Goods Shed Road, Railway Over Bridge - 590001","Vijaya Hospital - Civil Hospital Road, Opp BIMS - 590001","Yash Hospital - Mahadwar Road, Shahapur - 590001","College Road Multispeciality Hospital - College Road, Khade Bazar - 590001"],
+    "590002": ["Belagavi Childrens Hospital - Kirloskar Road, Kelkar Bagh - 590002 - Child Specialist","Drushya Eye Care Hospital - Gandhi Bhavan, College Road - 590002","Dr Bagewadi Eye & Dental - Basavan Galli - 590002"],
+    "590003": ["BHS Lakeview Heart & Superspeciality - Mahatma Phule Road, Shastri Nagar - 590003 - Heart, Emergency","Apoorva Multispeciality Hospital - Dr SPM Road, Shastri Nagar - 590003"],
+    "590005": ["KLE Centenary Charitable Hospital - Yellur Road, Anand Nagar, Vadgaon - 590005","Shri Sai Hospital - Laxmi Nagar Main Road, Vadgaon - 590005"],
+    "590006": ["Venugram Hospitals - Hindu Nagar, Near 3rd Railway Gate - 590006","Netradarshan Eye Hospital - Khanapur Road, Tilakwadi - 590006","Moon Maternity and Childrens Hospital - Mandi Road - 590006"],
+    "590009": ["Military Hospital - Thimayya Road, Camp - 590009"],
+    "590010": ["KLES Dr Prabhakar Kore Hospital - P.B. Road, Nehru Nagar - 590010 - BIGGEST, Multispeciality, Emergency","Arihant Hospital - Nehru Nagar - 590010","General Hospital - Azam Nagar - 590010"],
+    "590016": ["BHS Lakeview Hospital - Opp Fort Lake, Gandhi Nagar, Khanapur Road - 590016","Belgaum Cancer Hospital - Ashok Nagar - 590016 - Cancer","Ashok Hospital - Subhash Nagar - 590016"],
+    "590017": ["City Government Hospital - Mahantesh Nagar - 590017","Shree Nagar Hospital - Shree Nagar - 590017"],
+    "590019": ["Vijaya Ortho & Trauma Centre - Ayodhya Nagar, Sadashiv Nagar - 590019 - Ortho, Fracture","BELCITY Scan & Diagnostic - Ayodhya Nagar - 590019"],
+    "591307": ["Ganga Hospital - Mayur School Road, Gokak - 591307","Patil Eye Hospital - Court Road, Gokak - 591307","Taluka General Hospital Gokak - Gokak - 591307"],
+    "591310": ["Shri J G Co-operative Hospital - Near Gokak Road - 591310"],
+    "591317": ["Ajit Nursing Home - Chikkodi Road, Raibag - 591317"]
+}
+
+# ===== START - PATIENT FLOW =====
+print("="*60)
+print("SMART PATIENT CARE APP - BELGAUM")
+print("="*60)
+report_id = f"PAT-{random.randint(1000,9999)}"
+now = datetime.datetime.now().strftime("%d-%m-%Y %I:%M %p")
+print(f"Report ID: {report_id} | {now}")
+name = input("Patient Name: ")
+age = input("Patient Age: ")
+report = {"Report ID": report_id, "Date": now, "Name": name, "Age": age}
+first_aid = []
+do_not_do = []
+emergency = False
+
+print(f"\nPatient {name}: Bro, I am not feeling well")
+print("\nQ1: What type?")
+print("1. INTERNAL\n2. EXTERNAL")
+main = input("Type 1 or 2: ").strip()
+print("\nPain Scale? 1. No Pain 2. Little 1-3 3. Medium 4-6 4. High 7-8 5. Very High 9-10")
+report["Pain"] = input("Type: ")
+
+if main == "1":
+    report["Type"] = "INTERNAL"
+    causes = multi_select(internal_causes, "Q2: What happened? Causes:")
+    report["Causes"] = causes
+    print("\nQ3: PICK YOUR WALL - Which area is problem?")
+    for k,(wname,_) in internal_walls.items():
+        print(f"{k}. {wname}")
+    wall_choice = input("Type wall number (like 1,2 for 2 walls): ").strip()
+    symptoms = []
+    for wc in wall_choice.split(","):
+        wc = wc.strip()
+        if wc in internal_walls:
+            wname, wlist = internal_walls[wc]
+            if wlist is None:
+                symptoms += multi_select(internal_symptoms_full, f"WALL {wname} - Full 100:")
+            else:
+                symptoms += multi_select(wlist, f"Select in {wname}:")
+    report["Symptoms"] = symptoms
+    report["Walls"] = wall_choice
+    if any("Fever" in s for s in symptoms):
+        first_aid.append("FEVER: Rest, drink water, cold wet cloth on forehead.")
+    if any("Vomiting" in s or "Stomach" in s or "Loose" in s for s in symptoms):
+        first_aid.append("STOMACH: Drink ORS sip by sip, eat light khichdi, curd. No spicy.")
+    if any("Breathing" in s or "Chest" in s for s in symptoms):
+        first_aid.append("BREATHING: Sit straight, loosen clothes. If hard, GO HOSPITAL NOW.")
+        emergency = True
+    if any("Blood in" in s for s in symptoms):
+        emergency = True
+    if not first_aid:
+        first_aid.append("GENERAL: Rest, drink water, eat light.")
+    report["Medicine"] = single_select(["Yes - Paracetamol","Yes - Other Pill","No - No Medicine"], "Q4: Medicine taken?")
+    possible = "Fever + Food Poisoning" if any("Fever" in s for s in symptoms) and any("Stomach" in s for s in symptoms) else "Viral Fever / General Issue - Needs Doctor Check"
+else:
+    report["Type"] = "EXTERNAL"
+    causes = multi_select(external_causes, "Q2: What happened? Causes:")
+    report["Causes"] = causes
+    print("\nQ3: Where hurt? 1. Head/Face 2. Hand/Arm 3. Leg/Knee/Foot 4. Back/Shoulder 5. Other")
+    report["Hurt Area"] = input("Type: ")
+    print("\nQ4: Cut Size? 1. Very Small 2. Small 1-2cm 3. Medium 2-5cm 4. Large 5+cm 5. Deep")
+    report["Cut Size"] = input("Type: ")
+    print("\nQ5: PICK YOUR WALL - What is main problem?")
+    for k,(wname,_) in external_walls.items():
+        print(f"{k}. {wname}")
+    wall_choice = input("Type wall number (like 1,2): ").strip()
+    symptoms = []
+    for wc in wall_choice.split(","):
+        wc = wc.strip()
+        if wc in external_walls:
+            wname, wlist = external_walls[wc]
+            if wlist is None:
+                symptoms += multi_select(external_symptoms_full, f"WALL {wname} - Full 100:")
+            else:
+                symptoms += multi_select(wlist, f"Select in {wname}:")
+    report["Symptoms"] = symptoms
+    report["Walls"] = wall_choice
+    if any("Bleeding Lot" in s for s in symptoms):
+        first_aid.append("HEAVY BLEEDING: Press clean cloth 10 mins, do not remove. Keep part up. GO HOSPITAL NOW.")
+        emergency = True
+    elif any("Bleeding" in s for s in symptoms):
+        first_aid.append("SMALL BLEEDING: Wash hands, clean with water, press cloth 5 mins, Band-Aid.")
+    if any("Burn" in s for s in symptoms):
+        first_aid.append("BURN: Cool running water 10 mins. No toothpaste / haldi / ice. Cover clean cloth.")
+        do_not_do.append("Do NOT put toothpaste / ice on burn.")
+    if any("Swelling" in s or "Bruise" in s for s in symptoms):
+        first_aid.append("SWELLING: Cold pack in cloth 10 mins, 2-3 times. Do not press hard.")
+    if any("Cannot Move" in s for s in symptoms):
+        first_aid.append("CANNOT MOVE: Do NOT move forcefully. Support with cloth. Suspect fracture - GO HOSPITAL.")
+        emergency = True
+    if any("Bite" in s for s in symptoms):
+        first_aid.append("BITE: Wash soap + water 15 mins. Must go to doctor for injection.")
+    if not first_aid:
+        first_aid.append("MINOR WOUND: Clean with water, Band-Aid, keep dry.")
+    report["First Aid Done"] = single_select(["Yes - Band-Aid","Yes - Cream","Yes - H2O2 / Dettol","Yes - Haldi / Home","No - Nothing"], "Q6: Band-Aid / Cream / H2O2?")
+    possible = "Serious Wound - Hospital Needed" if emergency else "Wound - Home Care + Doctor Check"
+
+# ===== SEVERITY =====
+if emergency:
+    severity = "RED - EMERGENCY - GO NOW"
+elif report["Pain"] in ["4","5"]:
+    severity = "ORANGE - HIGH - Go to Doctor Today"
+elif report["Pain"] == "3":
+    severity = "YELLOW - MEDIUM"
+else:
+    severity = "GREEN - LOW - Home Care"
+report["Possible"] = possible
+report["Severity"] = severity
+
+print("\nLAST: Is this real? 1. YES Real 2. NO Practice")
+real = input("Type 1 or 2: ")
+
+# ===== FINAL REPORT + FIRST AID =====
+print("\n" + "="*60)
+print(f"FINAL REPORT - {report_id}")
+print("="*60)
+for k,v in report.items():
+    print(f"{k}: {v}")
+print(f"\nPossible: {possible}")
+print(f"Severity: {severity}")
+if emergency:
+    print("!!! RED ALERT - EMERGENCY SIGNS FOUND !!!")
+print("\n--- FIRST AID FOR YOUR SITUATION ---")
+for fa in first_aid:
+    print(f"- {fa}")
+print("\n--- WHAT NOT TO DO ---")
+for d in do_not_do:
+    print(f"- {d}")
+
+# ===== HOSPITAL FINDER - INSIDE SAME FLOW, FOR SICK PERSON =====
+print("\n" + "="*60)
+print("NEAREST HOSPITAL FOR YOU - BELGAUM")
+print("="*60)
+if emergency:
+    print("EMERGENCY: You need hospital NOW. Enter pincode to find closest.")
+else:
+    print("For safety, we will show nearest hospital for your case.")
+print("Example: 590001, 590010, 590006, 590016")
+pincode = input("Type your 6-digit Pincode: ").strip()
+
+def find_hospital(pin):
+    if pin in belgaum_hospitals:
+        return f"EXACT MATCH for {pin} - Hospitals near you:", belgaum_hospitals[pin]
+    try:
+        pin_num = int(pin)
+        closest = min(belgaum_hospitals.keys(), key=lambda x: abs(int(x) - pin_num))
+        return f"No exact hospital for {pin}. Showing NEAREST pincode {closest} hospitals:", belgaum_hospitals[closest]
+    except:
+        return "Invalid pincode. Showing top Belgaum hospitals:", belgaum_hospitals["590010"] + belgaum_hospitals["590001"]
+
+title, hospitals = find_hospital(pincode)
+print(f"\n{title}")
+for i, h in enumerate(hospitals, 1):
+    print(f"{i}. {h}")
+
+# Smart suggestion by type
+if main == "2" and any("Bleeding" in s for s in report["Symptoms"]):
+    print("\nSUGGESTION FOR YOU: For bleeding / trauma, go to BIMS 590001 or KLES 590010 - they have Emergency + Trauma.")
+elif main == "1" and "Fever" in str(report["Symptoms"]):
+    print("\nSUGGESTION FOR YOU: For fever, go to nearest hospital above, or KLES 590010 for full checkup.")
+
+print("\n--- EMERGENCY TIP ---")
+print("If RED ALERT / Bleeding not stopping / Breathing problem / Cannot move:")
+print("Call 108 Ambulance NOW and go to hospital above. Take this report screenshot.")
+if real == "1":
+    print("\n>>> REAL CASE: Go to doctor. App is for first aid only, not replacement of doctor. <<<")
+else:
+    print("\n>>> PRACTICE CASE: Stay Safe bro. <<<")
+print("\n--- END OF REPORT ---")
